@@ -64,8 +64,8 @@ public class Jwt {
             return false;
         }
 
-        Set<String> allowedAudience = this.payload.getAudience();
-        if (allowedAudience == null || !allowedAudience.contains(audience)) {
+        Set<String> tokenAudiences = this.payload.getAudience();
+        if (tokenAudiences == null || !tokenAudiences.contains(audience)) {
             return false;
         }
 

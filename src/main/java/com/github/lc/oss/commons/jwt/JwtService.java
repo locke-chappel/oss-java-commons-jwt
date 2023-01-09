@@ -9,8 +9,10 @@ import com.github.lc.oss.commons.signing.Algorithm;
 public abstract class JwtService {
     private final JwtRevocationList revocationList = new JwtRevocationList();
 
-    /*
-     * Note: must be able to handle a null value
+    /**
+     * Contract: If the <code>alg</code> argument is null then this method must
+     * return <code>false</code>. This method may return <code>true</code> if and
+     * only if the provided algorithm is acceptable to the implementer.
      */
     public abstract boolean isAlgorithmAllowed(Algorithm alg);
 
