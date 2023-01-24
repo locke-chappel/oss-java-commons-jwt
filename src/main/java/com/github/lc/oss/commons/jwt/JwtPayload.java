@@ -30,8 +30,8 @@ public class JwtPayload extends AbstractJwtMap {
         return this.getSet(Keys.Audience);
     }
 
-    public void setAudience(String audience) {
-        this.put(Keys.Audience, audience);
+    public void setAudience(String... audience) {
+        this.put(Keys.Audience, new HashSet<>(Arrays.asList(audience)));
     }
 
     public void setAudience(Collection<String> audience) {

@@ -65,7 +65,7 @@ public abstract class JwtService {
         return this.issue(alg, expirationMillis, null, subject, issuer, audience);
     }
 
-    public Jwt issue(Algorithm alg, Long expirationMillis, Long notBeforeMillis, String subject, String issuer, String audience) {
+    public Jwt issue(Algorithm alg, Long expirationMillis, Long notBeforeMillis, String subject, String issuer, String... audience) {
         if (Util.isBlank(alg) || //
                 Util.isBlank(expirationMillis) || //
                 Util.isBlank(subject) || //

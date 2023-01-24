@@ -229,7 +229,7 @@ public class JwtTest extends AbstractMockTest {
     }
 
     @Test
-    public void test_validate_missingAudience() {
+    public void test_validate_missingAudience_empty() {
         Jwt jwt = new Jwt();
         jwt.getHeader().put(JwtHeader.Keys.TokenType, "JWT");
         jwt.getHeader().setAlgorithm(Algorithms.HS256);
@@ -239,7 +239,24 @@ public class JwtTest extends AbstractMockTest {
         jwt.getPayload().setTokenId(UUID.randomUUID().toString());
         jwt.getPayload().setSubject("junit");
         jwt.getPayload().setIssuer("is-a");
-        jwt.getPayload().setAudience((String) null);
+        jwt.getPayload().setAudience(new HashSet<>());
+
+        boolean result = jwt.validate("audience", new HashSet<>(Arrays.asList("is-b", "is-a")));
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    public void test_validate_missingAudience_null() {
+        Jwt jwt = new Jwt();
+        jwt.getHeader().put(JwtHeader.Keys.TokenType, "JWT");
+        jwt.getHeader().setAlgorithm(Algorithms.HS256);
+        jwt.setExpirationMillis(System.currentTimeMillis() + 10000);
+        jwt.getPayload().setNotBeforeMillis(System.currentTimeMillis());
+        jwt.getPayload().setIssuedAtMillis(System.currentTimeMillis());
+        jwt.getPayload().setTokenId(UUID.randomUUID().toString());
+        jwt.getPayload().setSubject("junit");
+        jwt.getPayload().setIssuer("is-a");
+        jwt.getPayload().setAudience((Collection<String>) null);
 
         boolean result = jwt.validate("audience", new HashSet<>(Arrays.asList("is-b", "is-a")));
         Assertions.assertFalse(result);

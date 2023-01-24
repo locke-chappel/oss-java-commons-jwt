@@ -157,7 +157,7 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", "junit-ca", null);
+            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", "junit-ca", (String[]) null);
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("All parameters are required", ex.getMessage());
