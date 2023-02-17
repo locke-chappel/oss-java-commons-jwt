@@ -1,4 +1,4 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 public interface UserCache<T> {
     void add(T user, long expires);

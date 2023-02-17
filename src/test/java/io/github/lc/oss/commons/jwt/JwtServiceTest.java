@@ -1,4 +1,4 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.github.lc.oss.commons.signing.Algorithm;
-import com.github.lc.oss.commons.signing.Algorithms;
-import com.github.lc.oss.commons.testing.AbstractMockTest;
+import io.github.lc.oss.commons.signing.Algorithm;
+import io.github.lc.oss.commons.signing.Algorithms;
+import io.github.lc.oss.commons.testing.AbstractMockTest;
 
 public class JwtServiceTest extends AbstractMockTest {
     private static class TestClass extends JwtService {

@@ -1,4 +1,4 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +8,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.github.lc.oss.commons.signing.Algorithms;
-import com.github.lc.oss.commons.testing.AbstractMockTest;
+import io.github.lc.oss.commons.signing.Algorithms;
+import io.github.lc.oss.commons.testing.AbstractMockTest;
 
 public class UtilTest extends AbstractMockTest {
     @Test

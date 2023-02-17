@@ -1,4 +1,4 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.github.lc.oss.commons.testing.AbstractMockTest;
+import io.github.lc.oss.commons.testing.AbstractMockTest;
 
 public class AbstractJwtMapTest extends AbstractMockTest {
     private static class TestMap extends AbstractJwtMap {

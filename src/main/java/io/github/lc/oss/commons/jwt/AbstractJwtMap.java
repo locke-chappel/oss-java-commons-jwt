@@ -1,4 +1,4 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.util.Arrays;
 import java.util.Collection;

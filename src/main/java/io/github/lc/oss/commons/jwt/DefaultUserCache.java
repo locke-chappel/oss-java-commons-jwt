@@ -1,6 +1,6 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
-import com.github.lc.oss.commons.util.SimpleTimedCache;
+import io.github.lc.oss.commons.util.SimpleTimedCache;
 
 public class DefaultUserCache<T extends User> extends SimpleTimedCache<T> implements UserCache<T> {
     public DefaultUserCache() {

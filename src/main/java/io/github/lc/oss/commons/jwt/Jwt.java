@@ -1,8 +1,8 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.util.Set;
 
-import com.github.lc.oss.commons.signing.Algorithm;
+import io.github.lc.oss.commons.signing.Algorithm;
 
 public class Jwt {
     /**

@@ -1,10 +1,10 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.UUID;
 
-import com.github.lc.oss.commons.signing.Algorithm;
+import io.github.lc.oss.commons.signing.Algorithm;
 
 public abstract class JwtService {
     private final JwtRevocationList revocationList = new JwtRevocationList();

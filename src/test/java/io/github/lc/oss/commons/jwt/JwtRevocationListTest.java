@@ -1,11 +1,11 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.github.lc.oss.commons.testing.AbstractMockTest;
+import io.github.lc.oss.commons.testing.AbstractMockTest;
 
 public class JwtRevocationListTest extends AbstractMockTest {
     @Test

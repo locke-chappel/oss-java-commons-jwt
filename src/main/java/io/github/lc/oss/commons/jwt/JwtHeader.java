@@ -1,7 +1,7 @@
-package com.github.lc.oss.commons.jwt;
+package io.github.lc.oss.commons.jwt;
 
-import com.github.lc.oss.commons.signing.Algorithm;
-import com.github.lc.oss.commons.signing.Algorithms;
+import io.github.lc.oss.commons.signing.Algorithm;
+import io.github.lc.oss.commons.signing.Algorithms;
 
 public class JwtHeader extends AbstractJwtMap {
     private static final long serialVersionUID = 5967113948485997631L;
