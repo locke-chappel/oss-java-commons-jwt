@@ -48,9 +48,13 @@ public class Util {
     }
 
     public static String fromBase64(String data) {
-        return new String(java.util.Base64.getDecoder(). //
-                decode(data.trim()), //
-                StandardCharsets.UTF_8);
+        try {
+            return new String(java.util.Base64.getDecoder(). //
+                    decode(data.trim()), //
+                    StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     public static String toBase64Json(AbstractJwtMap map) {
@@ -67,6 +71,9 @@ public class Util {
 
     public static <T> T fromJson(String json, Class<T> clazz) {
         try {
+            if (json == null) {
+                return null;
+            }
             return Util.JSON_READER.readValue(json, clazz);
         } catch (IOException ex) {
             throw new RuntimeException("Error deserialzing object.", ex);

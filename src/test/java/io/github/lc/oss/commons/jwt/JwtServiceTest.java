@@ -302,13 +302,29 @@ public class JwtServiceTest extends AbstractMockTest {
     }
 
     @Test
-    public void test_validate_parseTokenError() {
+    public void test_validate_parseTokenError_badJson() {
         JwtService service = new TestClass();
 
         Jwt result = service.validate(null);
         Assertions.assertNull(result);
 
         result = service.validate("no-t.valid-base64.str-ing");
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void test_validate_parseTokenError() {
+        JwtService service = new TestClass() {
+            @Override
+            public boolean isAlgorithmAllowed(Algorithm alg) {
+                throw new RuntimeException("BOOM!");
+            }
+        };
+
+        Jwt result = service.validate(null);
+        Assertions.assertNull(result);
+
+        result = service.validate("ew0KICAiYWxnIjogIkVEMjU1MTkiLA0KICAidHlwIjogIkpXVCINCn0.e30.sig");
         Assertions.assertNull(result);
     }
 

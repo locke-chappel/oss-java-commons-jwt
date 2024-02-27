@@ -149,7 +149,7 @@ public abstract class JwtService {
 
         try {
             JwtHeader header = this.fromBase64Json(parts[0], JwtHeader.class);
-            if (!"JWT".equals(header.getTokenType())) {
+            if (header == null || !"JWT".equals(header.getTokenType())) {
                 this.log("Not a JWT token");
                 return null;
             }
