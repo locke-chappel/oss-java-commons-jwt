@@ -17,7 +17,8 @@ public class Util {
     }
 
     public static String toJson(Jwt token) {
-        return String.format("%s.%s.%s", Util.toBase64Json(token.getHeader()), Util.toBase64Json(token.getPayload()), token.getSignature());
+        return String.format("%s.%s.%s", Util.toBase64Json(token.getHeader()), Util.toBase64Json(token.getPayload()),
+                token.getSignature());
     }
 
     public static <T> T fromBase64Json(String base64, Class<T> clazz) {

@@ -103,9 +103,13 @@ public class JwtTest extends AbstractMockTest {
     public void test_validate_missingNotBefore() {
         Jwt jwt = new Jwt();
         jwt.getHeader().put(JwtHeader.Keys.TokenType, "JWT");
-        jwt.getHeader().setAlgorithm(Algorithms.HS256);
+        jwt.getHeader().setAlgorithm(Algorithms.ED25519);
         jwt.setExpirationMillis(System.currentTimeMillis());
         jwt.getPayload().put(JwtPayload.Keys.NotBefore, null);
+
+        Assertions.assertEquals(Algorithms.ED25519, jwt.getHeader().getAlgorithm());
+        Assertions.assertEquals("EdDSA", jwt.getHeader().getString(JwtHeader.Keys.Algorithm, false));
+        Assertions.assertEquals(Algorithms.ED25519.getId(), jwt.getHeader().getString(JwtHeader.Keys.Curve, false));
 
         boolean result = jwt.validate("audience", new HashSet<>(Arrays.asList("is-b", "is-a")));
         Assertions.assertFalse(result);
@@ -115,11 +119,14 @@ public class JwtTest extends AbstractMockTest {
     public void test_validate_missingIssuedAt() {
         Jwt jwt = new Jwt();
         jwt.getHeader().put(JwtHeader.Keys.TokenType, "JWT");
-        jwt.getHeader().setAlgorithm(Algorithms.HS256);
+        jwt.getHeader().setAlgorithm(Algorithms.ED448);
         jwt.setExpirationMillis(System.currentTimeMillis());
         jwt.getPayload().setNotBeforeMillis(System.currentTimeMillis());
         jwt.getPayload().put(JwtPayload.Keys.IssuedAt, null);
 
+        Assertions.assertEquals(Algorithms.ED448, jwt.getHeader().getAlgorithm());
+        Assertions.assertEquals("EdDSA", jwt.getHeader().getString(JwtHeader.Keys.Algorithm, false));
+        Assertions.assertEquals(Algorithms.ED448.getId(), jwt.getHeader().getString(JwtHeader.Keys.Curve, false));
         Assertions.assertNull(jwt.getIssuedAt());
 
         boolean result = jwt.validate("audience", new HashSet<>(Arrays.asList("is-b", "is-a")));
@@ -130,10 +137,12 @@ public class JwtTest extends AbstractMockTest {
     public void test_validate_expired() {
         Jwt jwt = new Jwt();
         jwt.getHeader().put(JwtHeader.Keys.TokenType, "JWT");
-        jwt.getHeader().setAlgorithm(Algorithms.HS256);
+        jwt.getHeader().setAlgorithm(Algorithms.ES256);
         jwt.setExpirationMillis(System.currentTimeMillis() - 1);
         jwt.getPayload().setNotBeforeMillis(System.currentTimeMillis());
         jwt.getPayload().setIssuedAtMillis(System.currentTimeMillis());
+
+        Assertions.assertNull(jwt.getHeader().getString(JwtHeader.Keys.Curve, false));
 
         boolean result = jwt.validate("audience", new HashSet<>(Arrays.asList("is-b", "is-a")));
         Assertions.assertFalse(result);
