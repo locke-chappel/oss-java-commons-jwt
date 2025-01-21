@@ -23,7 +23,7 @@ public class JwtServiceTest extends AbstractMockTest {
             if (alg == null) {
                 return false;
             }
-            return Algorithms.has(alg.getId());
+            return Algorithms.hmacAlgorithms().stream().anyMatch(a -> a.getId().equals(alg.getId()));
         }
 
         @Override
@@ -109,7 +109,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(null, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", "junit-ca", "junit-app");
+            service.issue(null, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", "junit-ca",
+                    "junit-app");
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("All parameters are required", ex.getMessage());
@@ -133,7 +134,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), null, "junit-ca", "junit-app");
+            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), null,
+                    "junit-ca", "junit-app");
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("All parameters are required", ex.getMessage());
@@ -145,7 +147,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", null, "junit-app");
+            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", null,
+                    "junit-app");
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("All parameters are required", ex.getMessage());
@@ -157,7 +160,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit", "junit-ca", (String[]) null);
+            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1, System.currentTimeMillis(), "junit",
+                    "junit-ca", (String[]) null);
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("All parameters are required", ex.getMessage());
@@ -169,7 +173,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis(), System.currentTimeMillis(), "junit", "junit-ca", "junit-app");
+            service.issue(Algorithms.HS256, System.currentTimeMillis(), System.currentTimeMillis(), "junit", "junit-ca",
+                    "junit-app");
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("Expiration must be in the future", ex.getMessage());
@@ -181,7 +186,8 @@ public class JwtServiceTest extends AbstractMockTest {
         JwtService service = new TestClass();
 
         try {
-            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1000, System.currentTimeMillis() + 2000, "junit", "junit-ca", "junit-app");
+            service.issue(Algorithms.HS256, System.currentTimeMillis() + 1000, System.currentTimeMillis() + 2000,
+                    "junit", "junit-ca", "junit-app");
             Assertions.fail("Expected exception");
         } catch (IllegalArgumentException ex) {
             Assertions.assertEquals("'Not Before' cannot come after 'expires'", ex.getMessage());
@@ -269,7 +275,8 @@ public class JwtServiceTest extends AbstractMockTest {
     public void test_signAndEcnode() {
         JwtService service = new TestClass();
 
-        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca", "junit-app");
+        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca",
+                "junit-app");
 
         String result = service.signAndEncode(jwt);
         Assertions.assertNotNull(result);
@@ -285,7 +292,8 @@ public class JwtServiceTest extends AbstractMockTest {
     public void test_signAndEcnode_specifyAudience() {
         JwtService service = new TestClass();
 
-        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca", "junit-app");
+        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca",
+                "junit-app");
 
         String result = service.signAndEncode(jwt);
         Assertions.assertNotNull(result);
@@ -318,6 +326,11 @@ public class JwtServiceTest extends AbstractMockTest {
             @Override
             public boolean isAlgorithmAllowed(Algorithm alg) {
                 throw new RuntimeException("BOOM!");
+            }
+
+            @Override
+            protected void assertNotMixedAlgorithms() {
+                // do nothing
             }
         };
 
@@ -484,7 +497,8 @@ public class JwtServiceTest extends AbstractMockTest {
     public void test_validate_invalidToken() {
         JwtService service = new TestClass();
 
-        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca2", "junit-app2");
+        Jwt jwt = service.issue(Algorithms.HS256, System.currentTimeMillis() + 100000, "junit", "junit-ca2",
+                "junit-app2");
 
         Jwt result = service.validate(service.signAndEncode(jwt));
         Assertions.assertNull(result);
@@ -623,5 +637,35 @@ public class JwtServiceTest extends AbstractMockTest {
         Assertions.assertNotEquals(oldId, newToken.getTokenId());
         Assertions.assertNotEquals(oldExpiration, newToken.getExpiration());
         Assertions.assertEquals(oldIssuedAt, newToken.getIssuedAt());
+    }
+
+    @Test
+    public void test_mixedAlgorithms() {
+        try {
+            new JwtService() {
+                @Override
+                protected long now() {
+                    return 0;
+                }
+
+                @Override
+                public boolean isAlgorithmAllowed(Algorithm alg) {
+                    return Algorithms.has(alg.getId());
+                }
+
+                @Override
+                public Set<String> getIssuers() {
+                    return null;
+                }
+
+                @Override
+                public String getAudience() {
+                    return null;
+                }
+            };
+        } catch (RuntimeException ex) {
+            Assertions.assertEquals("Insecure configuration detected. JWT verification must never permit "
+                    + "both HMAC and key based signatures at the same time.", ex.getMessage());
+        }
     }
 }

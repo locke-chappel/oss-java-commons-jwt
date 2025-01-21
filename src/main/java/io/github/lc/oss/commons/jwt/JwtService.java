@@ -5,14 +5,23 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.github.lc.oss.commons.signing.Algorithm;
+import io.github.lc.oss.commons.signing.Algorithms;
 
 public abstract class JwtService {
     private final JwtRevocationList revocationList = new JwtRevocationList();
 
+    public JwtService() {
+        this.assertNotMixedAlgorithms();
+    }
+
     /**
      * Contract: If the <code>alg</code> argument is null then this method must
      * return <code>false</code>. This method may return <code>true</code> if and
-     * only if the provided algorithm is acceptable to the implementer.
+     * only if the provided algorithm is acceptable to the implementer.<br />
+     * <br />
+     * DANGER: Never return true for both an HMAC algorithm and a key based
+     * algorithm! This would allow an attacker to use the public key as the shared
+     * HMAC secret thus enabling falsified tokens!
      */
     public abstract boolean isAlgorithmAllowed(Algorithm alg);
 
@@ -22,10 +31,18 @@ public abstract class JwtService {
 
     protected abstract long now();
 
+    /**
+     * Default implementation does not log anything. To log a message override the
+     * {@linkplain #log(String, Throwable)} method.
+     */
     protected void log(String message) {
         this.log(message, null);
     }
 
+    /**
+     * Default implementation does not log anything. To log a message override this
+     * method.
+     */
     protected void log(String message, Throwable ex) {
     }
 
@@ -47,7 +64,8 @@ public abstract class JwtService {
         }
 
         if (expiration < 0) {
-            throw new IllegalArgumentException("Expiration must be positive number but was " + Long.toString(expiration));
+            throw new IllegalArgumentException(
+                    "Expiration must be positive number but was " + Long.toString(expiration));
         }
 
         this.getRevocationList().revoke(signature, expiration + 10000);
@@ -65,7 +83,8 @@ public abstract class JwtService {
         return this.issue(alg, expirationMillis, null, subject, issuer, audience);
     }
 
-    public Jwt issue(Algorithm alg, Long expirationMillis, Long notBeforeMillis, String subject, String issuer, String... audience) {
+    public Jwt issue(Algorithm alg, Long expirationMillis, Long notBeforeMillis, String subject, String issuer,
+            String... audience) {
         if (Util.isBlank(alg) || //
                 Util.isBlank(expirationMillis) || //
                 Util.isBlank(subject) || //
@@ -123,7 +142,8 @@ public abstract class JwtService {
         if (s == null) {
             throw new RuntimeException("Secret cannot be null");
         }
-        token.setSignature(token.getAlgorithm().getSignature(s, Util.toJsonNoSignature(token).getBytes(StandardCharsets.UTF_8)));
+        token.setSignature(
+                token.getAlgorithm().getSignature(s, Util.toJsonNoSignature(token).getBytes(StandardCharsets.UTF_8)));
         return Util.toJson(token);
     }
 
@@ -225,5 +245,40 @@ public abstract class JwtService {
 
     protected <T> T fromBase64Json(String json, Class<T> clazz) {
         return Util.fromBase64Json(json, clazz);
+    }
+
+    /**
+     * This method will test the {@linkplain #isAlgorithmAllowed(Algorithm)} method
+     * to check if both HMAC and key based algorithms are permitted and if so it
+     * will throw an exception as this presents a security flaw that enables an
+     * attacker to forge their own tokens. <br />
+     * <br />
+     * Caution: Detection is based on
+     * {@linkplain io.github.lc.oss.commons.signing.Algorithms#hmacAlgorithms()} and
+     * {@linkplain io.github.lc.oss.commons.signing.Algorithms#keyAlgorithms()}.
+     * Custom algorithms that bypass those filtered sets will also bypass detection
+     * here.
+     */
+    protected void assertNotMixedAlgorithms() {
+        boolean hasHmac = false;
+        boolean hasKey = false;
+        for (Algorithm a : Algorithms.hmacAlgorithms()) {
+            if (this.isAlgorithmAllowed(a)) {
+                hasHmac = true;
+                break;
+            }
+        }
+
+        for (Algorithm a : Algorithms.keyAlgorithms()) {
+            if (this.isAlgorithmAllowed(a)) {
+                hasKey = true;
+                break;
+            }
+        }
+
+        if (hasHmac && hasKey) {
+            throw new RuntimeException("Insecure configuration detected. JWT verification must never permit "
+                    + "both HMAC and key based signatures at the same time.");
+        }
     }
 }
